@@ -8,7 +8,7 @@
 
 // I AM NOT DONE
 
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 
@@ -17,10 +17,10 @@ struct JobStatus {
 }
 
 fn main() {
-    let status = Arc::new(JobStatus { jobs_completed: 0 });
-    let status_shared = status.clone();
+    let status = Mutex::new(JobStatus { jobs_completed: 0 });
     thread::spawn(move || {
         for _ in 0..10 {
+            let mut job = status.lock()
             thread::sleep(Duration::from_millis(250));
             status_shared.jobs_completed += 1;
         }
