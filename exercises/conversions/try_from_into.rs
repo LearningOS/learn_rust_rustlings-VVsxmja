@@ -21,8 +21,6 @@ enum IntoColorError {
     IntConversion,
 }
 
-// I AM NOT DONE
-
 // Your task is to complete this implementation
 // and return an Ok result of inner type Color.
 // You need to create an implementation for a tuple of three integers,
@@ -32,10 +30,27 @@ enum IntoColorError {
 // but the slice implementation needs to check the slice length!
 // Also note that correct RGB color values must be integers in the 0..=255 range.
 
+macro_rules! get_color {
+    ($colorObj: ident.$color: ident, $colorFrom: expr) => {
+        if let Ok($color) = u8::try_from($colorFrom) {
+            $colorObj.$color = $color;
+        } else {
+            return Err(IntoColorError::IntConversion);
+        }
+    }
+}
+
 // Tuple implementation
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = IntoColorError;
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        let mut r = Color {
+            red: 0, green: 0, blue: 0,
+        };
+        get_color!(r.red, tuple.0);
+        get_color!(r.green, tuple.1);
+        get_color!(r.blue, tuple.2);
+        return Ok(r);
     }
 }
 
@@ -43,6 +58,13 @@ impl TryFrom<(i16, i16, i16)> for Color {
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        let mut r = Color {
+            red: 0, green: 0, blue: 0,
+        };
+        get_color!(r.red, arr[0]);
+        get_color!(r.green, arr[1]);
+        get_color!(r.blue, arr[2]);
+        return Ok(r);
     }
 }
 
@@ -50,6 +72,17 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if slice.len() != 3 {
+            return Err(IntoColorError::BadLen);
+        }
+
+        let mut r = Color {
+            red: 0, green: 0, blue: 0,
+        };
+        get_color!(r.red, slice[0]);
+        get_color!(r.green, slice[1]);
+        get_color!(r.blue, slice[2]);
+        return Ok(r);
     }
 }
 
